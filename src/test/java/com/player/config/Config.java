@@ -22,4 +22,12 @@ public class Config {
     public static String getAppBaseUrl() {
         return properties.getProperty("app.base.url");
     }
+
+    public static String getSupervisorLogin() {
+        return properties.getProperty("app.supervisor.login");
+    }
+
+    public static String getAdminLogin() {
+        return properties.getProperty("app.admin.login");
+    }
 }
