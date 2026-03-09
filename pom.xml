@@ -11,6 +11,7 @@
 
     <properties>
         <java.version>11</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <restassured.version>5.4.0</restassured.version>
         <testng.version>7.10.2</testng.version>
         <jackson.version>2.18.2</jackson.version>
@@ -68,7 +69,19 @@
                 <version>3.3.0</version>
                 <configuration>
                     <configLocation>checkstyle.xml</configLocation>
+                    <sourceDirectories>${project.build.testSourceDirectory}</sourceDirectories>
+                    <failsOnError>true</failsOnError>
+                    <consoleOutput>true</consoleOutput>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
         </plugins>
