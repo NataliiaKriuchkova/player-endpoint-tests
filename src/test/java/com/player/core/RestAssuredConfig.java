@@ -1,10 +1,22 @@
 package com.player.core;
 
 import com.player.config.Config;
-import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.http.ContentType;
+import io.restassured.specification.RequestSpecification;
 
-public class RestAssuredConfig {
-    static {
-        RestAssured.baseURI = Config.getAppBaseUrl();
+public final class RestAssuredConfig {
+
+    private static final RequestSpecification REQUEST_SPEC =
+            new RequestSpecBuilder()
+                    .setBaseUri(Config.getAppBaseUrl())
+                    .setContentType(ContentType.JSON)
+                    .setAccept(ContentType.JSON)
+                    .build();
+
+    private RestAssuredConfig() {}
+
+    public static RequestSpecification getRequestSpec() {
+        return REQUEST_SPEC;
     }
 }
