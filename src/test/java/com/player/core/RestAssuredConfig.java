@@ -3,6 +3,8 @@ package com.player.core;
 import com.player.config.Config;
 import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.filter.log.RequestLoggingFilter;
+import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 
@@ -13,6 +15,8 @@ public final class RestAssuredConfig {
                     .setBaseUri(Config.getAppBaseUrl())
                     .setContentType(ContentType.JSON)
                     .setAccept(ContentType.JSON)
+                    .addFilter(new RequestLoggingFilter())
+                    .addFilter(new ResponseLoggingFilter())
                     .addFilter(new AllureRestAssured())
                     .build();
 

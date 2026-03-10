@@ -16,7 +16,6 @@ public class CreatePlayerTest extends BaseTest {
         CreatePlayerRequest request = TestDataGenerator.validPlayer();
 
         Response response = playerClient.createPlayer(Config.getSupervisorLogin(), request);
-        response.then().log().all();
 
         CreatePlayerResponse created = response.as(CreatePlayerResponse.class);
         registerPlayer(created.getId());

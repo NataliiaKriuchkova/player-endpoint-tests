@@ -4,12 +4,16 @@ import com.player.client.PlayerClient;
 import com.player.config.Config;
 import com.player.model.request.DeletePlayerRequest;
 import io.restassured.specification.RequestSpecification;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.annotations.AfterMethod;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class BaseTest {
+
+    private static final Logger log = LogManager.getLogger(BaseTest.class);
 
     protected final RequestSpecification spec = RestAssuredConfig.getRequestSpec();
 
@@ -30,18 +34,22 @@ public abstract class BaseTest {
 
     @AfterMethod(alwaysRun = true)
     public void cleanup() {
+        log.info("Starting cleanup of created players");
         createdPlayers.get().forEach(this::safeDeletePlayer);
         createdPlayers.remove();
     }
 
     private void safeDeletePlayer(Long id) {
         try {
+            log.info("Cleaning up player with id={}", id);
+
             playerClient.deletePlayer(
                     supervisor,
                     new DeletePlayerRequest(id)
             );
+
         } catch (Exception e) {
-            // ignore cleanup failures; will add logging after logging setup
+            log.warn("Failed to delete player during cleanup. id={}", id, e);
         }
     }
 }
