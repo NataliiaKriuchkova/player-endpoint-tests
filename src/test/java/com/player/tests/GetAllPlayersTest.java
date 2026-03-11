@@ -1,22 +1,24 @@
 package com.player.tests;
 
 import com.player.core.BaseTest;
-import com.player.model.response.GetAllPlayersResponse;
-import io.restassured.response.Response;
+import com.player.model.response.PlayerItem;
+import com.player.testsupport.TestGroups;
+import io.qameta.allure.*;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.util.List;
+
+@Epic("Player API")
+@Feature("Get All Players")
 public class GetAllPlayersTest extends BaseTest {
 
-    @Test
+    @Story("GETALL-01 - Get all players returns non-empty list")
+    @Severity(SeverityLevel.NORMAL)
+    @Test(description = "GETALL-01 - Should return all players with non-empty list",
+            groups = {TestGroups.SMOKE})
     public void shouldReturnAllPlayers() {
-        Response response = playerClient.getAllPlayers();
-        response.then().log().all();
-
-        Assert.assertEquals(response.statusCode(), 200);
-
-        GetAllPlayersResponse body = response.as(GetAllPlayersResponse.class);
-        Assert.assertNotNull(body.getPlayers());
-        Assert.assertFalse(body.getPlayers().isEmpty());
+        List<PlayerItem> players = playerService.getAllPlayers();
+        Assert.assertFalse(players.isEmpty(), "players list should not be empty");
     }
 }

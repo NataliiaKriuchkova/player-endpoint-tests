@@ -1,37 +1,39 @@
 package com.player.tests;
 
-import com.player.config.Config;
 import com.player.core.BaseTest;
-import com.player.model.request.DeletePlayerRequest;
-import com.player.model.request.GetPlayerRequest;
-import com.player.model.response.CreatePlayerResponse;
-import com.player.utils.TestDataGenerator;
+import com.player.mapper.PlayerMapper;
+import com.player.model.Player;
+import com.player.testsupport.TestGroups;
+import io.qameta.allure.*;
 import io.restassured.response.Response;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+@Epic("Player API")
+@Feature("Delete Player")
 public class DeletePlayerTest extends BaseTest {
 
-    @Test
+    @Story("DEL-01 - Supervisor deletes player")
+    @Severity(SeverityLevel.CRITICAL)
+    @Test(description = "DEL-01 - Should delete player successfully",
+            groups = {TestGroups.SMOKE})
     public void shouldDeletePlayer() {
-        Response createResponse = playerClient.createPlayer(
-                Config.getSupervisorLogin(),
-                TestDataGenerator.validPlayer()
-        );
-        CreatePlayerResponse created = createResponse.as(CreatePlayerResponse.class);
-        Assert.assertEquals(createResponse.statusCode(), 200);
-        Assert.assertNotNull(created.getId());
+        Player created = createUser();
+        playerService.deletePlayer(supervisor, created.getId());
+        Assert.assertFalse(playerService.playerExistsById(created.getId()),
+                "deleted player should not exist in getAllPlayers");
+    }
 
-        Response deleteResponse = playerClient.deletePlayer(
-                Config.getSupervisorLogin(),
-                new DeletePlayerRequest(created.getId())
-        );
-        deleteResponse.then().log().all();
-        Assert.assertEquals(deleteResponse.statusCode(), 204);
-
-        // BUG: returns 200 with empty body instead of 404 for deleted player
-        Response getResponse = playerClient.getPlayer(new GetPlayerRequest(created.getId()));
-        getResponse.then().log().all();
-        Assert.assertEquals(getResponse.statusCode(), 404);
+    @Link(name = "BUG-DEL02: Deleted player returns 200 with empty body instead of 404", type = "issue")
+    @Story("DEL-02 - Get deleted player returns 404")
+    @Severity(SeverityLevel.NORMAL)
+    @Test(description = "DEL-02 - Should return 404 for deleted player",
+            groups = {TestGroups.BUG})
+    public void shouldReturn404ForDeletedPlayer() {
+        Player created = createUser();
+        playerService.deletePlayer(supervisor, created.getId());
+        Response response = playerClient.getPlayer(PlayerMapper.toGetRequest(created.getId()));
+        Assert.assertEquals(response.statusCode(), 404,
+                "deleted player should return 404");
     }
 }

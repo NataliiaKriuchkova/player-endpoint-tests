@@ -1,32 +1,23 @@
 package com.player.tests;
 
-import com.player.config.Config;
+import com.player.assertions.PlayerAssertions;
 import com.player.core.BaseTest;
-import com.player.model.request.GetPlayerRequest;
-import com.player.model.request.CreatePlayerRequest;
-import com.player.model.response.CreatePlayerResponse;
-import com.player.model.response.GetPlayerResponse;
-import com.player.utils.TestDataGenerator;
-import io.restassured.response.Response;
-import org.testng.Assert;
+import com.player.model.Player;
+import com.player.testsupport.TestGroups;
+import io.qameta.allure.*;
 import org.testng.annotations.Test;
 
+@Epic("Player API")
+@Feature("Get Player")
 public class GetPlayerTest extends BaseTest {
 
-    @Test
+    @Story("GET-01 - Get player by id returns correct player")
+    @Severity(SeverityLevel.CRITICAL)
+    @Test(description = "GET-01 - Should return player by id",
+            groups = {TestGroups.SMOKE})
     public void shouldReturnPlayerById() {
-        CreatePlayerRequest createRequest = TestDataGenerator.validPlayer();
-        Response createResponse = playerClient.createPlayer(Config.getSupervisorLogin(), createRequest);
-        CreatePlayerResponse created = createResponse.as(CreatePlayerResponse.class);
-        registerPlayer(created.getId());
-
-        Response response = playerClient.getPlayer(new GetPlayerRequest(created.getId()));
-        response.then().log().all();
-
-        GetPlayerResponse player = response.as(GetPlayerResponse.class);
-
-        Assert.assertEquals(response.statusCode(), 200);
-        Assert.assertEquals(player.getId(), created.getId());
-        Assert.assertEquals(player.getLogin(), createRequest.getLogin());
+        Player created = createUser();
+        Player actual = playerService.getPlayer(created.getId());
+        PlayerAssertions.assertPlayerEquals(created, actual);
     }
 }

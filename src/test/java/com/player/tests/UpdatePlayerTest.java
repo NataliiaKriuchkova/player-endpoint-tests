@@ -1,44 +1,33 @@
 package com.player.tests;
 
-import com.player.config.Config;
 import com.player.core.BaseTest;
-import com.player.model.request.UpdatePlayerRequest;
-import com.player.model.response.CreatePlayerResponse;
-import com.player.model.response.UpdatePlayerResponse;
+import com.player.model.Player;
+import com.player.testsupport.TestGroups;
 import com.player.utils.TestDataGenerator;
-import io.restassured.response.Response;
-import org.testng.Assert;
+import io.qameta.allure.*;
 import org.testng.annotations.Test;
+import org.testng.asserts.SoftAssert;
 
+@Epic("Player API")
+@Feature("Update Player")
 public class UpdatePlayerTest extends BaseTest {
 
-    @Test
+    @Story("UPD-01 - Supervisor updates player")
+    @Severity(SeverityLevel.CRITICAL)
+    @Test(description = "UPD-01 - Should update player age and screenName",
+            groups = {TestGroups.SMOKE})
     public void shouldUpdatePlayer() {
-        Response createResponse = playerClient.createPlayer(
-                Config.getSupervisorLogin(),
-                TestDataGenerator.validPlayer()
-        );
-        CreatePlayerResponse created = createResponse.as(CreatePlayerResponse.class);
-        Assert.assertEquals(createResponse.statusCode(), 200);
-        Assert.assertNotNull(created.getId());
-        registerPlayer(created.getId());
-
-        UpdatePlayerRequest updateRequest = UpdatePlayerRequest.builder()
+        Player created = createUser();
+        Player updatedData = created.toBuilder()
                 .age(30)
-                .screenName("UpdatedScreen30")
+                .screenName(TestDataGenerator.randomScreenName())
                 .build();
 
-        Response updateResponse = playerClient.updatePlayer(
-                Config.getSupervisorLogin(),
-                created.getId(),
-                updateRequest
-        );
-        updateResponse.then().log().all();
+        Player updated = playerService.updatePlayer(supervisor, updatedData);
 
-        UpdatePlayerResponse updated = updateResponse.as(UpdatePlayerResponse.class);
-
-        Assert.assertEquals(updateResponse.statusCode(), 200);
-        Assert.assertEquals(updated.getAge(), Integer.valueOf(30));
-        Assert.assertEquals(updated.getScreenName(), "UpdatedScreen30");
+        SoftAssert soft = new SoftAssert();
+        soft.assertEquals(updated.getAge(), Integer.valueOf(30), "age mismatch");
+        soft.assertEquals(updated.getScreenName(), updatedData.getScreenName(), "screenName mismatch");
+        soft.assertAll();
     }
 }

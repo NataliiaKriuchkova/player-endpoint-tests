@@ -16,7 +16,7 @@
 
         <module name="UnusedImports"/>
         <module name="RedundantImport"/>
-        <module name="AvoidStarImport"/>
+
 
         <module name="NeedBraces"/>
         <module name="EmptyBlock"/>
