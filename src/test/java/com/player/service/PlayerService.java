@@ -4,6 +4,7 @@ import com.player.assertions.PlayerAssertions;
 import com.player.client.PlayerClient;
 import com.player.mapper.PlayerMapper;
 import com.player.model.Player;
+import com.player.model.request.UpdatePlayerRequest;
 import com.player.model.response.CreatePlayerResponse;
 import com.player.model.response.GetAllPlayersResponse;
 import com.player.model.response.PlayerItem;
@@ -88,11 +89,6 @@ public class PlayerService {
                 .anyMatch(p -> p.getId() != null && p.getId() == playerId);
     }
 
-    public boolean playerExistsByScreenName(String screenName) {
-        return getAllPlayers().stream()
-                .anyMatch(p -> screenName.equals(p.getScreenName()));
-    }
-
     public void deletePlayer(String editor, long playerId) {
         client.deletePlayer(editor, PlayerMapper.toDeleteRequest(playerId));
     }
@@ -105,6 +101,12 @@ public class PlayerService {
         );
         PlayerAssertions.assertSuccessResponse(response);
 
+        return response.as(Player.class, JACKSON_2);
+    }
+
+    public Player updatePlayer(String editor, long id, UpdatePlayerRequest request) {
+        Response response = client.updatePlayer(editor, id, request);
+        PlayerAssertions.assertSuccessResponse(response);
         return response.as(Player.class, JACKSON_2);
     }
 }

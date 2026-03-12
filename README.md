@@ -59,14 +59,14 @@ src/test/java/com/player/
 └── utils/
 ```
 
-| Layer        | Purpose                                |
-|--------------|----------------------------------------|
-| `client`     | HTTP calls to API endpoints            |
-| `service`    | Business logic wrapper over client     |
-| `mapper`     | Conversion between models and requests |
-| `assertions` | Reusable assertion methods             |
-| `utils`      | Test data generation and providers     |
-| `core`       | Base test infrastructure               |
+| Layer | Purpose |
+|-------|---------|
+| `client` | HTTP calls to API endpoints |
+| `service` | Business logic wrapper over client |
+| `mapper` | Conversion between models and requests |
+| `assertions` | Reusable assertion methods |
+| `utils` | Test data generation and providers |
+| `core` | Base test infrastructure |
 
 ---
 
@@ -95,7 +95,7 @@ Tests run in parallel using TestNG:
 
 ```xml
 parallel="methods"
-        thread-count="3"
+thread-count="3"
 ```
 
 Configuration: `src/test/resources/testng.xml`
@@ -104,12 +104,12 @@ Configuration: `src/test/resources/testng.xml`
 
 ## Test Groups
 
-| Group      | Purpose                             |
-|------------|-------------------------------------|
-| `smoke`    | Core functionality                  |
-| `negative` | Validation and rejection tests      |
-| `create`   | Player creation tests               |
-| `bug`      | Tests that expose known API defects |
+| Group | Purpose |
+|-------|---------|
+| `smoke` | Core functionality |
+| `negative` | Validation and rejection tests |
+| `create` | Player creation tests |
+| `bug` | Tests that expose known API defects |
 
 ---
 
@@ -312,7 +312,6 @@ These bugs are visible in Allure under **Product defects**.
 **Actual:** Invalid passwords are accepted and player is created.
 
 Password rules per spec:
-
 - Latin letters and digits only
 - Minimum 7 characters
 - Maximum 15 characters
@@ -394,7 +393,7 @@ Password rules per spec:
 **Expected:** A user should not be allowed to delete another user. Request should return `403 Forbidden`.
 
 **Actual:** Returns `204 No Content` — the target user is successfully deleted.
- 
+
 ---
 
 #### BUG-DEL05 - Admin can delete another admin
@@ -405,13 +404,34 @@ Password rules per spec:
 **Expected:** Admin should only be able to delete himself, not other admins. Request should return `403 Forbidden`.
 
 **Actual:** Returns `204 No Content` — another admin is successfully deleted.
- 
+
+---
+
+#### BUG-UPD04 - User can update another user
+
+**Severity:** Critical  
+**Endpoint:** `PATCH /player/update/{editor}/{id}`
+
+**Expected:** A user should not be allowed to update another user. Request should return `403 Forbidden`.
+
+**Actual:** Returns `200 OK` — another user's data is successfully updated.
+
+---
+
+#### BUG-UPD05 - Duplicate login returns undocumented 409 Conflict
+
+**Severity:** Minor  
+**Endpoint:** `PATCH /player/update/{editor}/{id}`
+
+**Expected:** Update with a duplicate login should return `403 Forbidden` (or any documented error code).
+
+**Actual:** Returns `409 Conflict` — which is not documented in Swagger. Documented response codes are: `200`, `204`, `401`, `403`.
+
 ---
 
 ### Architecture and Security Bugs
 
-These bugs represent design and security issues that cannot be reliably covered by functional autotests, but pose
-serious risks in a production environment.
+These bugs represent design and security issues that cannot be reliably covered by functional autotests, but pose serious risks in a production environment.
 
 ---
 
@@ -420,8 +440,7 @@ serious risks in a production environment.
 **Severity:** Major  
 **Endpoint:** `GET /player/create/{editor}`
 
-The `GET` method is used to create a new resource. Per HTTP specification, `GET` must be safe (no side effects) and
-idempotent.
+The `GET` method is used to create a new resource. Per HTTP specification, `GET` must be safe (no side effects) and idempotent.
 
 Creating a resource must use `POST`:
 
@@ -439,7 +458,6 @@ POST /player
 **Endpoint:** `GET /player/create/{editor}`
 
 **Request:**
-
 ```
 GET /player/create/supervisor?password=kbnao505&login=...
 ```
@@ -462,8 +480,7 @@ Query parameters are stored in browser history, server access logs, proxy logs, 
 **Severity:** Critical  
 **Endpoints:** `POST /player/get`, `GET /player/create/{editor}`
 
-Returning a password in any API response is a security violation regardless of whether it is hashed or plaintext. Even a
-hashed value enables offline brute-force attacks.
+Returning a password in any API response is a security violation regardless of whether it is hashed or plaintext. Even a hashed value enables offline brute-force attacks.
 
 **Actual:** The `password` field is present and populated in both the create and get player responses.
 
@@ -510,10 +527,10 @@ Location: /player/674173172
 **Severity:** Minor  
 **Endpoint:** `DELETE /player/delete/{editor}`
 
-| Case             | Expected status  |
-|------------------|------------------|
-| Delete success   | `204 No Content` |
-| Player not found | `404 Not Found`  |
+| Case | Expected status |
+|------|----------------|
+| Delete success | `204 No Content` |
+| Player not found | `404 Not Found` |
 
 **Actual:** The endpoint may return `200` even when the player does not exist.
 
@@ -524,8 +541,7 @@ Location: /player/674173172
 **Severity:** Critical  
 **Endpoint:** `GET /player/create/{editor}`
 
-Per Swagger specification, `password` is the only field marked as `required: false`. All other fields are required. This
-means a player can be created without a password.
+Per Swagger specification, `password` is the only field marked as `required: false`. All other fields are required. This means a player can be created without a password.
 
 **Correct approach:** Password must be a required field on creation.
 
@@ -536,15 +552,13 @@ means a player can be created without a password.
 **Severity:** Critical  
 **Endpoint:** `PATCH /player/update/{editor}/{id}`
 
-`PlayerUpdateRequestDto` contains a `role` field. However, the API documentation explicitly states that only the
-following fields can be updated:
+`PlayerUpdateRequestDto` contains a `role` field. However, the API documentation explicitly states that only the following fields can be updated:
 
 ```
 age, gender, login, password, screenName
 ```
 
-`role` is not in the list. If the API accepts role changes through this endpoint, any user could potentially escalate
-their own privileges.
+`role` is not in the list. If the API accepts role changes through this endpoint, any user could potentially escalate their own privileges.
 
 ---
 
@@ -553,8 +567,7 @@ their own privileges.
 **Severity:** Major  
 **Endpoint:** `GET /player/get/all`
 
-The endpoint is publicly accessible. Any anonymous client can retrieve the full list of players including their `id`,
-`role`, `screenName`, `age`, and `gender` without any authentication.
+The endpoint is publicly accessible. Any anonymous client can retrieve the full list of players including their `id`, `role`, `screenName`, `age`, and `gender` without any authentication.
 
 ---
 
@@ -563,9 +576,7 @@ The endpoint is publicly accessible. Any anonymous client can retrieve the full 
 **Severity:** Minor  
 **Endpoints:** `GET /player/get/all` vs `POST /player/get`
 
-`GET /player/get/all` returns `PlayerItem` which does not include `login`. `POST /player/get` returns
-`PlayerGetByPlayerIdResponseDto` which does include `login`. The same resource is represented differently depending on
-the endpoint, which creates an inconsistent API contract.
+`GET /player/get/all` returns `PlayerItem` which does not include `login`. `POST /player/get` returns `PlayerGetByPlayerIdResponseDto` which does include `login`. The same resource is represented differently depending on the endpoint, which creates an inconsistent API contract.
 
 ---
 
