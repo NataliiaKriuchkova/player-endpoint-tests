@@ -1,0 +1,6 @@
+[
+  {
+    "name": "Product defects",
+    "matchedStatuses": ["failed"]
+  }
+]

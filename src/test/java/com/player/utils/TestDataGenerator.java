@@ -33,7 +33,7 @@ public final class TestDataGenerator {
     }
 
     public static int randomAge() {
-        return ThreadLocalRandom.current().nextInt(MIN_AGE, MAX_AGE);
+        return ThreadLocalRandom.current().nextInt(MIN_AGE, MAX_AGE + 1);
     }
 
     public static String randomGender() {

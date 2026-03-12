@@ -17,20 +17,22 @@ jobs:
         with:
           distribution: temurin
           java-version: 11
+          cache: maven
 
       - name: Run tests
-        run: mvn clean test
+        run: mvn -B clean verify
+
+      - name: Debug target folder
+        if: always()
+        run: ls -R target
 
       - name: Generate Allure report
         if: always()
-        uses: simple-elf/allure-report-action@v1
-        with:
-          allure_results: target/allure-results
-          allure_report: allure-report
+        run: mvn allure:report
 
       - name: Deploy report to GitHub Pages
         if: always()
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: allure-report
+          publish_dir: target/site/allure-maven-plugin

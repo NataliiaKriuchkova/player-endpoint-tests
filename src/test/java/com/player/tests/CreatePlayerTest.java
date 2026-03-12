@@ -31,6 +31,7 @@ public class CreatePlayerTest extends BaseTest {
         SoftAssert soft = new SoftAssert();
         soft.assertNotNull(created.getAge(), "age should not be null");
         soft.assertNotNull(created.getGender(), "gender should not be null");
+        soft.assertNotNull(created.getPassword(), "password should not be null");
         soft.assertNotNull(created.getRole(), "role should not be null");
         soft.assertNotNull(created.getScreenName(), "screenName should not be null");
         soft.assertAll();
