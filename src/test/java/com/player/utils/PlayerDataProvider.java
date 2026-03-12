@@ -4,11 +4,12 @@ import org.testng.annotations.DataProvider;
 
 public final class PlayerDataProvider {
 
-    private PlayerDataProvider() {}
+    private PlayerDataProvider() {
+    }
 
     @DataProvider(name = "invalidPasswords")
     public static Object[][] invalidPasswords() {
-        return new Object[][] {
+        return new Object[][]{
                 {TestDataGenerator.tooShortPassword()},
                 {TestDataGenerator.tooLongPassword()},
                 {TestDataGenerator.passwordWithoutDigits()},
@@ -18,7 +19,7 @@ public final class PlayerDataProvider {
 
     @DataProvider(name = "validAges")
     public static Object[][] validAges() {
-        return new Object[][] {
+        return new Object[][]{
                 {TestDataGenerator.MIN_AGE},
                 {TestDataGenerator.MAX_AGE},
         };
@@ -26,7 +27,7 @@ public final class PlayerDataProvider {
 
     @DataProvider(name = "invalidAges")
     public static Object[][] invalidAges() {
-        return new Object[][] {
+        return new Object[][]{
                 {TestDataGenerator.MIN_AGE - 1},
                 {TestDataGenerator.MAX_AGE + 1}
         };
@@ -34,7 +35,7 @@ public final class PlayerDataProvider {
 
     @DataProvider(name = "invalidGenders")
     public static Object[][] invalidGenders() {
-        return new Object[][] {
+        return new Object[][]{
                 {"unknown"},
                 {"transgender"},
                 {"Male"},
@@ -47,13 +48,22 @@ public final class PlayerDataProvider {
 
     @DataProvider(name = "invalidRoles")
     public static Object[][] invalidRoles() {
-        return new Object[][] {
+        return new Object[][]{
                 {"supervisor"},
                 {"guest"},
                 {"ADMIN"},
                 {"USER"},
                 {""},
                 {"123"},
+        };
+    }
+
+    @DataProvider(name = "invalidPlayerIds")
+    public static Object[][] invalidPlayerIds() {
+        return new Object[][]{
+                {-1L},
+                {0L},
+                {Long.MAX_VALUE}
         };
     }
 }
